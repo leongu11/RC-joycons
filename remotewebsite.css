@@ -1,0 +1,16 @@
+.vertical-slider {
+	writing-mode: vertical-lr;
+	appearance: slider-vertical;
+	-webkit-appearance: slider-vertical;
+				
+	width: 64px;
+	height: 800px;
+	direction: rtl;
+}
+
+body {
+	align-items: center;
+	display: flex;
+	background-color: #f9e7e7;
+	justify-content: center;
+}

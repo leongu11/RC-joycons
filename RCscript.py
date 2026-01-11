@@ -1,6 +1,23 @@
 import RPi.GPIO as GPIO
 import time
+import websockets
+import asyncio
 
+
+#setting up connection to websocket/joycon
+
+async def handler(ws):
+    async for msg in ws:
+        #instead of looping through msg, js use map to do all at once
+        
+        steering, throttle = map(float, msg.split(","))
+        print("direction: ", steering, "throttle: ", throttle)
+        
+async def main():
+    async with websockets.serve(handler, "", 1234):
+        await asyncio.Future()
+
+# setting up motors 
 GPIO.setmode(GPIO.BCM)
 
 lFor = 17
@@ -14,81 +31,55 @@ GPIO.setup(lFor,GPIO.OUT)
 GPIO.setup(lBack,GPIO.OUT)
 GPIO.setup(rFor,GPIO.OUT)
 
+steer = 0
+throttle = 0
 
-while True:
+#running threads
 
-    i = input()
-    
-    if i == 'w':
-        GPIO.output(rFor,GPIO.HIGH)
-        GPIO.output(lFor,GPIO.HIGH)
-        time.sleep(1)
-        GPIO.output(rFor,GPIO.LOW)
-        GPIO.output(rBack,GPIO.LOW)
-        GPIO.output(lFor,GPIO.LOW)
-        GPIO.output(lBack,GPIO.LOW)
-        
-    if i == 'a':
-        GPIO.output(lFor,GPIO.HIGH)
-        time.sleep(.5)
-        GPIO.output(rFor,GPIO.LOW)
-        GPIO.output(rBack,GPIO.LOW)
-        GPIO.output(lFor,GPIO.LOW)
-        GPIO.output(lBack,GPIO.LOW)
-        
-    if i == 'd':
-        GPIO.output(rFor,GPIO.HIGH)
-        time.sleep(.5)
-        GPIO.output(rFor,GPIO.LOW)
-        GPIO.output(rBack,GPIO.LOW)
-        GPIO.output(lFor,GPIO.LOW)
-        GPIO.output(lBack,GPIO.LOW)
-    if i == 'r':
-        GPIO.output(rBack,GPIO.HIGH)
-        GPIO.output(lBack,GPIO.HIGH)
-        time.sleep(1)
-        GPIO.output(rFor,GPIO.LOW)
-        GPIO.output(rBack,GPIO.LOW)
-        GPIO.output(lFor,GPIO.LOW)
-        GPIO.output(lBack,GPIO.LOW)
+asyncio.run(main())
+
+GPIO.cleanup()
 
 
+
+##
+##while True:
 ##
 ##    i = input()
 ##    
 ##    if i == 'w':
 ##        GPIO.output(rFor,GPIO.HIGH)
 ##        GPIO.output(lFor,GPIO.HIGH)
-##    if i == 'a':
-##        GPIO.output(lFor,GPIO.HIGH)
-##    if i == 'd':
-##        GPIO.output(rFor,GPIO.HIGH)
-##    if i == 'r':
-##        GPIO.output(rBack,GPIO.HIGH)
-##        GPIO.output(lBack,GPIO.HIGH)
-##    if i == 's':
+##        time.sleep(1)
 ##        GPIO.output(rFor,GPIO.LOW)
 ##        GPIO.output(rBack,GPIO.LOW)
 ##        GPIO.output(lFor,GPIO.LOW)
 ##        GPIO.output(lBack,GPIO.LOW)
-
-        
-##GPIO.output(rFor,GPIO.HIGH)
-##GPIO.output(lFor,GPIO.HIGH)
-##time.sleep(2)
-##GPIO.output(rFor,GPIO.LOW)
-##GPIO.output(lFor,GPIO.LOW)
+##        
+##    if i == 'a':
+##        GPIO.output(lFor,GPIO.HIGH)
+##        time.sleep(.5)
+##        GPIO.output(rFor,GPIO.LOW)
+##        GPIO.output(rBack,GPIO.LOW)
+##        GPIO.output(lFor,GPIO.LOW)
+##        GPIO.output(lBack,GPIO.LOW)
+##        
+##    if i == 'd':
+##        GPIO.output(rFor,GPIO.HIGH)
+##        time.sleep(.5)
+##        GPIO.output(rFor,GPIO.LOW)
+##        GPIO.output(rBack,GPIO.LOW)
+##        GPIO.output(lFor,GPIO.LOW)
+##        GPIO.output(lBack,GPIO.LOW)
+##    if i == 'r':
+##        GPIO.output(rBack,GPIO.HIGH)
+##        GPIO.output(lBack,GPIO.HIGH)
+##        time.sleep(1)
+##        GPIO.output(rFor,GPIO.LOW)
+##        GPIO.output(rBack,GPIO.LOW)
+##        GPIO.output(lFor,GPIO.LOW)
+##        GPIO.output(lBack,GPIO.LOW)
 ##
-##GPIO.output(rFor,GPIO.LOW)
-##GPIO.output(lFor,GPIO.HIGH)
-##time.sleep(0.5)
-##GPIO.output(rFor,GPIO.LOW)
-##GPIO.output(lFor,GPIO.LOW)
 ##
-##GPIO.output(rBack,GPIO.HIGH)
-##GPIO.output(lBack,GPIO.HIGH)
-##time.sleep(1)
-##GPIO.output(rBack,GPIO.LOW)
-##GPIO.output(lBack,GPIO.LOW)
 
-GPIO.cleanup()
+
