@@ -7,14 +7,16 @@ import asyncio
 #setting up connection to websocket/joycon
 
 async def handler(ws):
+    #calls for msgs
     async for msg in ws:
         #instead of looping through msg, js use map to do all at once
+        throttle, pitch, aButton= map(str, msg.split(","))
+        return pitch,throttle,aButton
+        print("direction: ", pitch, "throttle: ", throttle, aButton)
         
-        steering, throttle = map(float, msg.split(","))
-        print("direction: ", steering, "throttle: ", throttle)
-        
+# creates websocket
 async def main():
-    async with websockets.serve(handler, "", 1234):
+    async with websockets.serve(handler, "", 5432):
         await asyncio.Future()
 
 # setting up motors 
@@ -31,12 +33,10 @@ GPIO.setup(lFor,GPIO.OUT)
 GPIO.setup(lBack,GPIO.OUT)
 GPIO.setup(rFor,GPIO.OUT)
 
-steer = 0
-throttle = 0
 
 #running threads
 
-asyncio.run(main())
+pitch,throttle,aButton = asyncio.run(main())
 
 GPIO.cleanup()
 

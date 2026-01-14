@@ -1,5 +1,3 @@
-
-
 //website side
 
 const pitch = document.getElementById("pitch");
@@ -21,8 +19,30 @@ function send() {
 
 window.addEventListener("gamepadconnected", (event) => {
 	console.log("gamepad connected");
-	console.log(event.gamepad.id)
+	console.log(event.gamepad.id);
 });
+
+//websocket
+
+
+const ws = new WebSocket("ws://10.0.0.238:5432");
+
+ws.addEventListener('open', () => {
+	console.log('connected to server');
+});
+
+//for reconnections etcs ty stackoverflow
+function readyState(ws) {
+	if (ws.readyState === ws.OPEN) {
+		return true
+	}
+	//make new
+	else {
+		ws.close()
+		const ws = new WebSocket("ws://10.0.0.238:5432");
+		readyState(newws);
+	}
+}
 
 //loop to check state
 
@@ -38,9 +58,39 @@ function pollGamepad() {
 	
 		if (gp.id.includes("Joy-Con")) {
 			const xAxis = gp.axes[0];
+			const yAxis = gp.axes[1];
 			const stopBut = gp.buttons[0].pressed;
 			//js rounds for printing, dont use for math -- add a system which takes certain thresholds and determines direction
-			console.log(xAxis.toFixed,stopBut);
+			//update the web w/thresholds
+			
+			//pitch
+			if (xAxis>0.5) {
+				document.getElementById('pitch').value = 1;
+			}
+			else if (xAxis<-0.5) {
+				document.getElementById('pitch').value = -1;
+			}
+			
+			else {
+				document.getElementById('pitch').value = 0;
+			}
+			//throttles
+			if (yAxis>0.5) {
+				document.getElementById('throttle').value --;
+			}
+			
+			else if (yAxis<-0.5) {
+				document.getElementById('throttle').value ++;
+			}
+			
+			if (readyState(ws) === true) {
+				motorData = [document.getElementById('throttle').value,document.getElementById('pitch').value,stopBut]
+				ws.send(JSON.stringify(motorData));
+			}
+			
+			else {
+				console.log("BAD");
+			}
 		}
 		//recursive-type infinite call
 	}
@@ -49,3 +99,5 @@ function pollGamepad() {
 }
 
 pollGamepad();
+
+
