@@ -11,8 +11,19 @@ async def handler(ws):
     async for msg in ws:
         #instead of looping through msg, js use map to do all at once
         throttle, pitch, aButton= map(str, msg.split(","))
-        print("direction: ", pitch, "throttle: ", throttle, aButton)
-        
+        print(pitch,throttle, aButton)
+
+        throttle = throttle[2:-1]
+        throttle = int(throttle)
+
+        if throttle<0:
+            BthrottleLeft.ChangeDutyCycle(abs(throttle))
+            BthrottleRight.ChangeDutyCycle(abs(throttle))
+        if throttle >= 0:
+            FthrottleLeft.ChangeDutyCycle(throttle)
+            FthrottleRight.ChangeDutyCycle(throttle)
+
+
 # creates websocket
 async def main():
     async with websockets.serve(handler, "", 5432):
@@ -32,10 +43,23 @@ GPIO.setup(lFor,GPIO.OUT)
 GPIO.setup(lBack,GPIO.OUT)
 GPIO.setup(rFor,GPIO.OUT)
 
+#initializing pwm instances and starting at 0
 
-#running threads
+FthrottleLeft = GPIO.PWM(lFor,100)
+FthrottleRight = GPIO.PWM(rFor,100)
+BthrottleLeft = GPIO.PWM(lBack,100)
+BthrottleRight = GPIO.PWM(rBack,100)
 
-pitch,throttle,aButton = asyncio.run(main())
+FthrottleLeft.start(0)
+FthrottleRight.start(0)
+BthrottleLeft.start(0)
+BthrottleRight.start(0)
+
+#running threads -- changes inside asyncio
+
+asyncio.run(main())
+
+
 
 GPIO.cleanup()
 

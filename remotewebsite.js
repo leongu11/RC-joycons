@@ -40,10 +40,8 @@ function readyState() {
 	//make new
 	else if (ws.readyState === ws.CLOSED && wsFlag === false) {
 		let ws = new WebSocket("ws://10.0.0.238:5432");
-		let wsFlag = true
 		ws.addEventListener('open', () => {
 			console.log('reconnecting');
-			let wsFlag = false;
 		});
 		return false;
 	}
